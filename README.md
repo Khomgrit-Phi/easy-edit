@@ -1,4 +1,4 @@
-# 2D Studio
+# Easy Edit
 
 A web-based 2D layered image/configuration editor — a focused mix of Figma, Canva, and a professional 2D editor, built to demonstrate a reusable 2D editing engine rather than a specific business use case.
 

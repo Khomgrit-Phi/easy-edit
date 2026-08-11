@@ -7,10 +7,6 @@ const [editingName,setEditingName]=React.useState(false);
 const [nameVal,setNameVal]=React.useState(projectName);
 return (
 <div style={{height:56,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 16px',borderBottom:'1px solid var(--border-default)',background:'var(--surface-panel,#fff)'}}>
-<div style={{display:'flex',flexDirection:'column',lineHeight:1.1}}>
-<span style={{fontFamily:'var(--font-display)',fontWeight:700,fontSize:16,color:'var(--text-primary)'}}>Easy Edit</span>
-<span style={{fontFamily:'var(--font-mono)',fontSize:10,letterSpacing:'.04em',color:'var(--text-secondary)',textTransform:'uppercase'}}>2D Image Editor Engine</span>
-</div>
 <div style={{display:'flex',alignItems:'center',gap:10}}>
 {editingName?
 <input autoFocus value={nameVal} onChange={e=>setNameVal(e.target.value)} onBlur={()=>{setProjectName(nameVal||'Untitled Project');setEditingName(false);}} onKeyDown={e=>{if(e.key==='Enter')e.target.blur();}} style={{fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,padding:'6px 10px',borderRadius:'var(--radius-sm)',border:'1px solid var(--border-default)',textAlign:'center'}}/>
