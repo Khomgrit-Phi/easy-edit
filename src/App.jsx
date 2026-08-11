@@ -6,11 +6,17 @@ import LeftSidebar from './LeftSidebar.jsx';
 import RightPanel from './RightPanel.jsx';
 import LayerPanel from './LayerPanel.jsx';
 import Resizer from './Resizer.jsx';
+import { useMediaQuery } from './useMediaQuery.js';
 
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 
 export default function App(){
-const {Dialog,Toast,Button}=window.EasyEditDesignSystem_1140d6;
+const {Dialog,Toast,Button,IconButton}=window.EasyEditDesignSystem_1140d6;
+const isCompact=useMediaQuery('(max-width: 1023px)');
+const isPhone=useMediaQuery('(max-width: 479px)');
+const [openDrawer,setOpenDrawer]=React.useState(null);
+const topBarRef=React.useRef(null);
+const [topBarHeight,setTopBarHeight]=React.useState(56);
 const [canvas,setCanvas]=React.useState(null);
 const [leftWidth,setLeftWidth]=React.useState(288);
 const [rightWidth,setRightWidth]=React.useState(308);
@@ -32,6 +38,17 @@ const [confirmTemplate,setConfirmTemplate]=React.useState(null);
 const historyRef=React.useRef([]);
 const historyIdxRef=React.useRef(-1);
 const restoringRef=React.useRef(false);
+
+React.useEffect(()=>{if(!isCompact)setOpenDrawer(null);},[isCompact]);
+React.useEffect(()=>{
+const el=topBarRef.current;if(!el)return;
+const ro=new ResizeObserver(entries=>{
+const h=entries[0].contentRect.height;
+if(h>0)setTopBarHeight(h);
+});
+ro.observe(el);
+return ()=>ro.disconnect();
+},[]);
 
 function setDocSize(patch){setDocSizeState(s=>({...s,...patch}));}
 function notice(msg){setToast({msg});window.clearTimeout(window.__studioToastT);window.__studioToastT=window.setTimeout(()=>setToast(null),2600);}
@@ -143,19 +160,48 @@ if(fmt==='JPG')StudioEngine.exportJPG(canvas,base);
 notice(`Exported ${fmt}`);
 }
 
+const rightPanelProps={canvas,selection,docSize:docSizeState,setDocSize,docBg,setDocBg,snapCenter,setSnapCenter,snapObjects,setSnapObjects,grid,setGrid,touch};
+function closeDrawer(){setOpenDrawer(null);}
+
 return (
-<div style={{height:'100vh',minWidth:1180,width:'100%',display:'flex',flexDirection:'column',fontFamily:'var(--font-body)',background:'var(--surface-app,#f5f6f8)',overflowX:'auto',overflowY:'hidden'}}>
-{!previewMode&&<TopBar projectName={projectName} setProjectName={setProjectName} onUndo={doUndo} onRedo={doRedo} onSave={handleSave} onPreview={()=>setPreviewMode(true)} onExport={handleExport} dirty={dirty} templateName={templateName}/>}
-<div style={{flex:1,display:'flex',minHeight:0}}>
-{!previewMode&&<LeftSidebar tool={tool} setTool={setTool} onAddAsset={handleAddAsset} onSelectTemplate={requestTemplate} width={leftWidth}/>}
-{!previewMode&&<Resizer direction="horizontal" onResize={dx=>setLeftWidth(w=>clamp(w+dx,220,480))}/>}
-<div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0}}>
-<CanvasArea onReady={setCanvas} onSelectionChange={setSelection} onLayersChange={setLayers} onDirty={()=>setDirty(true)} onNotice={notice} docSize={docSizeState} docBg={docBg} tool={previewMode?'select':tool} setTool={setTool} grid={grid} snapCenter={snapCenter} snapObjects={snapObjects}/>
+<div style={{height:'100vh',minWidth:isCompact?0:1180,width:'100%',display:'flex',flexDirection:'column',fontFamily:'var(--font-body)',background:'var(--surface-app,#f5f6f8)',overflowX:isCompact?'hidden':'auto',overflowY:'hidden'}}>
+<div ref={topBarRef} style={{position:'relative',zIndex:50,flexShrink:0}}>
+{!previewMode&&<TopBar projectName={projectName} setProjectName={setProjectName} onUndo={doUndo} onRedo={doRedo} onSave={handleSave} onPreview={()=>setPreviewMode(true)} onExport={handleExport} dirty={dirty} templateName={templateName} isCompact={isCompact} isPhone={isPhone} onToggleLeftDrawer={()=>setOpenDrawer(d=>d==='left'?null:'left')} onToggleRightDrawer={()=>setOpenDrawer(d=>d==='right'?null:'right')}/>}
 </div>
-{!previewMode&&canvas&&<Resizer direction="horizontal" onResize={dx=>setRightWidth(w=>clamp(w-dx,260,520))}/>}
-{!previewMode&&canvas&&
+<div style={{flex:1,display:'flex',minHeight:0}}>
+{!previewMode&&!isCompact&&<LeftSidebar tool={tool} setTool={setTool} onAddAsset={handleAddAsset} onSelectTemplate={requestTemplate} width={leftWidth}/>}
+{!previewMode&&!isCompact&&<Resizer direction="horizontal" onResize={dx=>setLeftWidth(w=>clamp(w+dx,220,480))}/>}
+
+{!previewMode&&isCompact&&openDrawer&&<div onClick={closeDrawer} style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:35}}/>}
+
+{!previewMode&&isCompact&&
+<div style={{position:'fixed',top:topBarHeight,bottom:0,left:0,width:'min(86vw,340px)',background:'var(--surface-panel,#fff)',borderRight:'1px solid var(--border-default)',boxShadow:'var(--shadow-lg)',display:'flex',flexDirection:'column',minHeight:0,transform:`translateX(${openDrawer==='left'?'0':'-100%'})`,transition:'transform 220ms ease',zIndex:40}}>
+<div style={{display:'flex',justifyContent:'flex-end',padding:8,borderBottom:'1px solid var(--border-default)',flexShrink:0}}>
+<IconButton icon="✕" label="Close" onClick={closeDrawer}/>
+</div>
+<div style={{flex:1,minHeight:0,display:'flex'}}>
+<LeftSidebar tool={tool} setTool={setTool} onAddAsset={handleAddAsset} onSelectTemplate={requestTemplate} width="100%"/>
+</div>
+</div>}
+
+<div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0}}>
+<CanvasArea onReady={setCanvas} onSelectionChange={setSelection} onLayersChange={setLayers} onDirty={()=>setDirty(true)} onNotice={notice} docSize={docSizeState} docBg={docBg} tool={previewMode?'select':tool} setTool={setTool} grid={grid} snapCenter={snapCenter} snapObjects={snapObjects} autoFit={isCompact}/>
+</div>
+
+{!previewMode&&!isCompact&&canvas&&<Resizer direction="horizontal" onResize={dx=>setRightWidth(w=>clamp(w-dx,260,520))}/>}
+{!previewMode&&!isCompact&&canvas&&
 <div style={{width:rightWidth,flexShrink:0,borderLeft:'1px solid var(--border-default)',background:'var(--surface-app,#f5f6f8)',display:'flex',flexDirection:'column',minHeight:0}}>
-<RightPanel canvas={canvas} selection={selection} docSize={docSizeState} setDocSize={setDocSize} docBg={docBg} setDocBg={setDocBg} snapCenter={snapCenter} setSnapCenter={setSnapCenter} snapObjects={snapObjects} setSnapObjects={setSnapObjects} grid={grid} setGrid={setGrid} touch={touch}/>
+<RightPanel {...rightPanelProps}/>
+<Resizer direction="vertical" onResize={dy=>setLayerHeight(h=>clamp(h-dy,100,640))}/>
+<LayerPanel canvas={canvas} layers={layers} selectedId={selection&&selection.id} touch={touch} height={layerHeight}/>
+</div>}
+
+{!previewMode&&isCompact&&canvas&&
+<div style={{position:'fixed',top:topBarHeight,bottom:0,right:0,width:'min(88vw,360px)',background:'var(--surface-app,#f5f6f8)',borderLeft:'1px solid var(--border-default)',boxShadow:'var(--shadow-lg)',display:'flex',flexDirection:'column',minHeight:0,transform:`translateX(${openDrawer==='right'?'0':'100%'})`,transition:'transform 220ms ease',zIndex:40}}>
+<div style={{display:'flex',justifyContent:'flex-end',padding:8,borderBottom:'1px solid var(--border-default)',flexShrink:0}}>
+<IconButton icon="✕" label="Close" onClick={closeDrawer}/>
+</div>
+<RightPanel {...rightPanelProps}/>
 <Resizer direction="vertical" onResize={dy=>setLayerHeight(h=>clamp(h-dy,100,640))}/>
 <LayerPanel canvas={canvas} layers={layers} selectedId={selection&&selection.id} touch={touch} height={layerHeight}/>
 </div>}

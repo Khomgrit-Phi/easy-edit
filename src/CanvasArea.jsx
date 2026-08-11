@@ -6,7 +6,7 @@ function toolbarBtnStyle(primary){return {border:'none',background:primary?'var(
 const zoomBtnStyle={width:28,height:28,border:'none',background:'transparent',borderRadius:'var(--radius-pill)',cursor:'pointer',fontSize:15,color:'var(--text-primary)'};
 
 export default function CanvasArea(props){
-const {onReady,onSelectionChange,onLayersChange,onDirty,onNotice,docSize,docBg,tool,setTool,grid,snapCenter,snapObjects}=props;
+const {onReady,onSelectionChange,onLayersChange,onDirty,onNotice,docSize,docBg,tool,setTool,grid,snapCenter,snapObjects,autoFit}=props;
 const canvasElRef=React.useRef(null);
 const fabricRef=React.useRef(null);
 const containerRef=React.useRef(null);
@@ -143,15 +143,31 @@ reader.readAsDataURL(file);
 e.target.value='';
 }
 
-function doZoom(next){setZoomPctState(Math.max(20,Math.min(300,Math.round(next))));}
+function doZoom(next){setZoomPctState(Math.max(10,Math.min(300,Math.round(next))));}
 function onWheel(e){e.preventDefault();doZoom(zoomPct*(e.deltaY<0?1.08:0.92));}
 function fitZoom(){
 const cont=containerRef.current;if(!cont)return;
 const pad=80;const availW=cont.clientWidth-pad,availH=cont.clientHeight-pad;
 const z=Math.min(availW/docSize.w,availH/docSize.h)*100;
-setZoomPctState(Math.max(20,Math.min(300,Math.round(z))));
+setZoomPctState(Math.max(10,Math.min(300,Math.round(z))));
 setPanOffset({x:0,y:0});
 }
+
+const autoFitRef=React.useRef(autoFit);
+autoFitRef.current=autoFit;
+const fitZoomRef=React.useRef(fitZoom);
+fitZoomRef.current=fitZoom;
+const firstFitDoneRef=React.useRef(false);
+React.useEffect(()=>{
+const cont=containerRef.current;if(!cont)return;
+const ro=new ResizeObserver(()=>{
+if(!firstFitDoneRef.current){firstFitDoneRef.current=true;fitZoomRef.current();return;}
+if(autoFitRef.current)fitZoomRef.current();
+});
+ro.observe(cont);
+return ()=>ro.disconnect();
+// eslint-disable-next-line
+},[]);
 
 function onContainerMouseDown(e){
 const panActive=tool==='pan'||spaceDownRef.current;

@@ -4,19 +4,26 @@ export default function Resizer({ direction = 'horizontal', onResize }) {
   const [active, setActive] = React.useState(false);
   const [hover, setHover] = React.useState(false);
 
+  function startDrag(getPos) {
+    setActive(true);
+    let last = getPos();
+    function move(pos) {
+      const delta = pos - last;
+      last = pos;
+      if (delta !== 0) onResize(delta);
+    }
+    return { move, last: () => last };
+  }
+
   function onMouseDown(e) {
     e.preventDefault();
-    setActive(true);
-    let last = direction === 'horizontal' ? e.clientX : e.clientY;
     const prevCursor = document.body.style.cursor;
     const prevSelect = document.body.style.userSelect;
     document.body.style.cursor = direction === 'horizontal' ? 'col-resize' : 'row-resize';
     document.body.style.userSelect = 'none';
+    const drag = startDrag(() => (direction === 'horizontal' ? e.clientX : e.clientY));
     function onMove(ev) {
-      const pos = direction === 'horizontal' ? ev.clientX : ev.clientY;
-      const delta = pos - last;
-      last = pos;
-      if (delta !== 0) onResize(delta);
+      drag.move(direction === 'horizontal' ? ev.clientX : ev.clientY);
     }
     function onUp() {
       setActive(false);
@@ -25,8 +32,31 @@ export default function Resizer({ direction = 'horizontal', onResize }) {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
     }
+    setActive(true);
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
+  }
+
+  function onTouchStart(e) {
+    const t = e.touches[0];
+    if (!t) return;
+    const drag = startDrag(() => (direction === 'horizontal' ? t.clientX : t.clientY));
+    function onMove(ev) {
+      const touch = ev.touches[0];
+      if (!touch) return;
+      ev.preventDefault();
+      drag.move(direction === 'horizontal' ? touch.clientX : touch.clientY);
+    }
+    function onEnd() {
+      setActive(false);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+      window.removeEventListener('touchcancel', onEnd);
+    }
+    setActive(true);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd);
+    window.addEventListener('touchcancel', onEnd);
   }
 
   const isH = direction === 'horizontal';
@@ -39,6 +69,7 @@ export default function Resizer({ direction = 'horizontal', onResize }) {
   return (
     <div
       onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -47,6 +78,7 @@ export default function Resizer({ direction = 'horizontal', onResize }) {
         width: isH ? 6 : '100%',
         height: isH ? '100%' : 6,
         cursor: isH ? 'col-resize' : 'row-resize',
+        touchAction: 'none',
         zIndex: 10,
       }}
     >

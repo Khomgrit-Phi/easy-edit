@@ -1,25 +1,26 @@
 import React from 'react';
 
-export default function TopBar({projectName,setProjectName,onUndo,onRedo,onSave,onPreview,onExport,dirty,templateName}){
+export default function TopBar({projectName,setProjectName,onUndo,onRedo,onSave,onPreview,onExport,dirty,templateName,isCompact,isPhone,onToggleLeftDrawer,onToggleRightDrawer}){
 const {IconButton,Button,Badge}=window.EasyEditDesignSystem_1140d6;
 const [exportOpen,setExportOpen]=React.useState(false);
 const [editingName,setEditingName]=React.useState(false);
 const [nameVal,setNameVal]=React.useState(projectName);
 return (
-<div style={{height:56,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 16px',borderBottom:'1px solid var(--border-default)',background:'var(--surface-panel,#fff)'}}>
+<div style={{minHeight:56,flexShrink:0,display:'flex',flexWrap:'wrap',rowGap:8,alignItems:'center',justifyContent:'space-between',padding:'10px 16px',borderBottom:'1px solid var(--border-default)',background:'var(--surface-panel,#fff)'}}>
 <div style={{display:'flex',alignItems:'center',gap:10}}>
+{isCompact&&<IconButton icon="☰" label="Tools & assets" onClick={onToggleLeftDrawer}/>}
 {editingName?
 <input autoFocus value={nameVal} onChange={e=>setNameVal(e.target.value)} onBlur={()=>{setProjectName(nameVal||'Untitled Project');setEditingName(false);}} onKeyDown={e=>{if(e.key==='Enter')e.target.blur();}} style={{fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,padding:'6px 10px',borderRadius:'var(--radius-sm)',border:'1px solid var(--border-default)',textAlign:'center'}}/>
 :<span onClick={()=>{setNameVal(projectName);setEditingName(true);}} style={{fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,color:'var(--text-primary)',cursor:'text',padding:'6px 4px'}}>{projectName}</span>}
 {templateName&&<Badge tone="neutral">{templateName}</Badge>}
 </div>
-<div style={{display:'flex',alignItems:'center',gap:6}}>
+<div style={{display:'flex',flexWrap:'wrap',rowGap:8,alignItems:'center',justifyContent:'flex-end',gap:6}}>
 <IconButton icon="↶" label="Undo" onClick={onUndo}/>
 <IconButton icon="↷" label="Redo" onClick={onRedo}/>
 <div style={{width:1,height:20,background:'var(--border-default)',margin:'0 4px'}}/>
-<span style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'var(--text-secondary)',marginRight:6}}>
-<span style={{width:6,height:6,borderRadius:'50%',background:dirty?'#d99a1b':'#1ea672',display:'inline-block'}}/>
-{dirty?'Unsaved changes':'All changes saved'}
+<span title={dirty?'Unsaved changes':'All changes saved'} style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'var(--text-secondary)',marginRight:6}}>
+<span style={{width:6,height:6,borderRadius:'50%',background:dirty?'#d99a1b':'#1ea672',display:'inline-block',flexShrink:0}}/>
+{!isPhone&&(dirty?'Unsaved changes':'All changes saved')}
 </span>
 <Button variant="secondary" size="sm" onClick={onSave}>Save</Button>
 <Button variant="secondary" size="sm" onClick={onPreview}>Preview</Button>
@@ -29,6 +30,7 @@ return (
 {['PDF','PNG','JPG'].map(f=><button key={f} onClick={()=>{onExport(f);setExportOpen(false);}} style={{textAlign:'left',padding:'8px 10px',border:'none',background:'transparent',cursor:'pointer',fontSize:13,color:'var(--text-primary)',borderRadius:'var(--radius-xs)'}} onMouseEnter={e=>e.currentTarget.style.background='var(--gray-100)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>Export {f}</button>)}
 </div>}
 </div>
+{isCompact&&<IconButton icon="▤" label="Properties & layers" onClick={onToggleRightDrawer}/>}
 </div>
 </div>);
 }
