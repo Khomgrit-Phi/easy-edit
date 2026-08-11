@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+--font-display:'Space Grotesk',system-ui,sans-serif;--font-body:'IBM Plex Sans',system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+--size-display-xl:64px;--lh-display-xl:1.05;/* @kind other */--tr-display-xl:-.02em;/* @kind other */--wt-display-xl:600;/* @kind other */
+--size-display-lg:44px;--lh-display-lg:1.1;/* @kind other */--tr-display-lg:-.02em;/* @kind other */--wt-display-lg:600;/* @kind other */
+--size-headline:28px;--lh-headline:1.25;/* @kind other */--tr-headline:-.01em;/* @kind other */--wt-headline:600;/* @kind other */
+--size-title:20px;--lh-title:1.3;/* @kind other */--wt-title:600;/* @kind other */
+--size-body-lg:17px;--lh-body-lg:1.55;/* @kind other */--wt-body-lg:400;/* @kind other */
+--size-body:15px;--lh-body:1.55;/* @kind other */--wt-body:400;/* @kind other */
+--size-body-sm:13px;--lh-body-sm:1.45;/* @kind other */--wt-body-sm:400;/* @kind other */
+--size-label:12px;--lh-label:1.3;/* @kind other */--wt-label:500;/* @kind other */--tr-label:.04em;/* @kind other */
+--size-caption:11px;--lh-caption:1.3;/* @kind other */--wt-caption:500;/* @kind other */--tr-caption:.04em/* @kind other */
+}
