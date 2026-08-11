@@ -5,10 +5,16 @@ import TopBar from './TopBar.jsx';
 import LeftSidebar from './LeftSidebar.jsx';
 import RightPanel from './RightPanel.jsx';
 import LayerPanel from './LayerPanel.jsx';
+import Resizer from './Resizer.jsx';
+
+const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 
 export default function App(){
 const {Dialog,Toast,Button}=window.EasyEditDesignSystem_1140d6;
 const [canvas,setCanvas]=React.useState(null);
+const [leftWidth,setLeftWidth]=React.useState(288);
+const [rightWidth,setRightWidth]=React.useState(308);
+const [layerHeight,setLayerHeight]=React.useState(480);
 const [tool,setTool]=React.useState('select');
 const [selection,setSelection]=React.useState(null);
 const [layers,setLayers]=React.useState([]);
@@ -141,14 +147,17 @@ return (
 <div style={{height:'100vh',minWidth:1180,width:'100%',display:'flex',flexDirection:'column',fontFamily:'var(--font-body)',background:'var(--surface-app,#f5f6f8)',overflowX:'auto',overflowY:'hidden'}}>
 {!previewMode&&<TopBar projectName={projectName} setProjectName={setProjectName} onUndo={doUndo} onRedo={doRedo} onSave={handleSave} onPreview={()=>setPreviewMode(true)} onExport={handleExport} dirty={dirty} templateName={templateName}/>}
 <div style={{flex:1,display:'flex',minHeight:0}}>
-{!previewMode&&<LeftSidebar tool={tool} setTool={setTool} onAddAsset={handleAddAsset} onSelectTemplate={requestTemplate}/>}
+{!previewMode&&<LeftSidebar tool={tool} setTool={setTool} onAddAsset={handleAddAsset} onSelectTemplate={requestTemplate} width={leftWidth}/>}
+{!previewMode&&<Resizer direction="horizontal" onResize={dx=>setLeftWidth(w=>clamp(w+dx,220,480))}/>}
 <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0}}>
 <CanvasArea onReady={setCanvas} onSelectionChange={setSelection} onLayersChange={setLayers} onDirty={()=>setDirty(true)} onNotice={notice} docSize={docSizeState} docBg={docBg} tool={previewMode?'select':tool} setTool={setTool} grid={grid} snapCenter={snapCenter} snapObjects={snapObjects}/>
 </div>
+{!previewMode&&canvas&&<Resizer direction="horizontal" onResize={dx=>setRightWidth(w=>clamp(w-dx,260,520))}/>}
 {!previewMode&&canvas&&
-<div style={{width:308,flexShrink:0,borderLeft:'1px solid var(--border-default)',background:'var(--surface-app,#f5f6f8)',display:'flex',flexDirection:'column',minHeight:0}}>
+<div style={{width:rightWidth,flexShrink:0,borderLeft:'1px solid var(--border-default)',background:'var(--surface-app,#f5f6f8)',display:'flex',flexDirection:'column',minHeight:0}}>
 <RightPanel canvas={canvas} selection={selection} docSize={docSizeState} setDocSize={setDocSize} docBg={docBg} setDocBg={setDocBg} snapCenter={snapCenter} setSnapCenter={setSnapCenter} snapObjects={snapObjects} setSnapObjects={setSnapObjects} grid={grid} setGrid={setGrid} touch={touch}/>
-<LayerPanel canvas={canvas} layers={layers} selectedId={selection&&selection.id} touch={touch}/>
+<Resizer direction="vertical" onResize={dy=>setLayerHeight(h=>clamp(h-dy,100,640))}/>
+<LayerPanel canvas={canvas} layers={layers} selectedId={selection&&selection.id} touch={touch} height={layerHeight}/>
 </div>}
 </div>
 {previewMode&&<button onClick={()=>setPreviewMode(false)} style={{position:'fixed',top:16,right:16,zIndex:50,padding:'8px 16px',borderRadius:'var(--radius-pill)',border:'1px solid var(--border-default)',background:'#fff',cursor:'pointer',fontFamily:'var(--font-body)',fontSize:13,fontWeight:600}}>Exit preview</button>}

@@ -11,13 +11,13 @@ if(shape==='ring')return <div style={{width:20,height:20,borderRadius:'50%',bord
 if(shape==='line')return <div style={{width:26,height:3,background:color}}/>;
 return <div style={s}/>;
 }
-export default function LeftSidebar({tool,setTool,onAddAsset,onSelectTemplate}){
+export default function LeftSidebar({tool,setTool,onAddAsset,onSelectTemplate,width=288}){
 const {Tabs,Card}=window.EasyEditDesignSystem_1140d6;
 const {TOOLS,ASSET_TABS,ASSETS,TEMPLATES}=STUDIO_DATA;
 const [assetTab,setAssetTab]=React.useState('Images');
 const items=ASSETS[assetTab]||[];
 return (
-<div style={{width:288,flexShrink:0,borderRight:'1px solid var(--border-default)',background:'var(--surface-panel,#fff)',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+<div style={{width,flexShrink:0,borderRight:'1px solid var(--border-default)',background:'var(--surface-panel,#fff)',display:'flex',flexDirection:'column',overflowY:'auto'}}>
 <div style={{padding:14,display:'flex',flexDirection:'column',gap:4,borderBottom:'1px solid var(--border-default)'}}>
 {TOOLS.map(t=>{
 const active=tool===t.id;

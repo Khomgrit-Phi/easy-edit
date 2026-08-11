@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LayerPanel({canvas,layers,selectedId,touch}){
+export default function LayerPanel({canvas,layers,selectedId,touch,height=480}){
 const {LayerRow}=window.EasyEditDesignSystem_1140d6;
 const [renamingId,setRenamingId]=React.useState(null);
 const [renameVal,setRenameVal]=React.useState('');
@@ -19,7 +19,7 @@ canvas.requestRenderAll();
 canvas.fire('object:modified',{target:canvas.getActiveObject()});
 }
 return (
-<div style={{height:176,flexShrink:0,borderTop:'1px solid var(--border-default,#e5e7eb)',background:'var(--surface-canvas,#141518)',display:'flex',flexDirection:'column'}}>
+<div style={{height,flexShrink:0,borderTop:'1px solid var(--border-default,#e5e7eb)',background:'var(--surface-canvas,#141518)',display:'flex',flexDirection:'column'}}>
 <div style={{padding:'8px 14px',fontFamily:'var(--font-mono)',fontSize:'var(--size-label)',letterSpacing:'var(--tr-label)',textTransform:'uppercase',color:'var(--text-inverse-secondary)',borderBottom:'1px solid var(--border-dark)'}}>Layers</div>
 <div style={{flex:1,overflowY:'auto',padding:'6px 10px',display:'flex',flexDirection:'column',gap:2}}>
 {layers.length===0&&<div style={{color:'var(--text-inverse-secondary)',fontSize:13,padding:'12px 4px'}}>No layers yet — add a shape, image, or text to get started.</div>}
