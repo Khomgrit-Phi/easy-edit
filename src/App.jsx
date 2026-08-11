@@ -144,9 +144,12 @@ return (
 {!previewMode&&<LeftSidebar tool={tool} setTool={setTool} onAddAsset={handleAddAsset} onSelectTemplate={requestTemplate}/>}
 <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0}}>
 <CanvasArea onReady={setCanvas} onSelectionChange={setSelection} onLayersChange={setLayers} onDirty={()=>setDirty(true)} onNotice={notice} docSize={docSizeState} docBg={docBg} tool={previewMode?'select':tool} setTool={setTool} grid={grid} snapCenter={snapCenter} snapObjects={snapObjects}/>
-{!previewMode&&canvas&&<LayerPanel canvas={canvas} layers={layers} selectedId={selection&&selection.id} touch={touch}/>}
 </div>
-{!previewMode&&canvas&&<RightPanel canvas={canvas} selection={selection} docSize={docSizeState} setDocSize={setDocSize} docBg={docBg} setDocBg={setDocBg} snapCenter={snapCenter} setSnapCenter={setSnapCenter} snapObjects={snapObjects} setSnapObjects={setSnapObjects} grid={grid} setGrid={setGrid} touch={touch}/>}
+{!previewMode&&canvas&&
+<div style={{width:308,flexShrink:0,borderLeft:'1px solid var(--border-default)',background:'var(--surface-app,#f5f6f8)',display:'flex',flexDirection:'column',minHeight:0}}>
+<RightPanel canvas={canvas} selection={selection} docSize={docSizeState} setDocSize={setDocSize} docBg={docBg} setDocBg={setDocBg} snapCenter={snapCenter} setSnapCenter={setSnapCenter} snapObjects={snapObjects} setSnapObjects={setSnapObjects} grid={grid} setGrid={setGrid} touch={touch}/>
+<LayerPanel canvas={canvas} layers={layers} selectedId={selection&&selection.id} touch={touch}/>
+</div>}
 </div>
 {previewMode&&<button onClick={()=>setPreviewMode(false)} style={{position:'fixed',top:16,right:16,zIndex:50,padding:'8px 16px',borderRadius:'var(--radius-pill)',border:'1px solid var(--border-default)',background:'#fff',cursor:'pointer',fontFamily:'var(--font-body)',fontSize:13,fontWeight:600}}>Exit preview</button>}
 {toast&&<div style={{position:'fixed',bottom:20,left:'50%',transform:'translateX(-50%)',zIndex:60}}><Toast tone="success">{toast.msg}</Toast></div>}

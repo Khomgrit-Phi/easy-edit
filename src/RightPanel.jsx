@@ -150,7 +150,7 @@ body=(
 }
 
 return (
-<div style={{width:308,flexShrink:0,borderLeft:'1px solid var(--border-default)',background:'var(--surface-app,#f5f6f8)',padding:14,overflowY:'auto'}}>
+<div style={{flex:1,minHeight:0,padding:14,overflowY:'auto'}}>
 {body}
 </div>);
 }
