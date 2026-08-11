@@ -9,6 +9,7 @@ return (
 <div style={{minHeight:56,flexShrink:0,display:'flex',flexWrap:'wrap',rowGap:8,alignItems:'center',justifyContent:'space-between',padding:'10px 16px',borderBottom:'1px solid var(--border-default)',background:'var(--surface-panel,#fff)'}}>
 <div style={{display:'flex',alignItems:'center',gap:10}}>
 {isCompact&&<IconButton icon="☰" label="Tools & assets" onClick={onToggleLeftDrawer}/>}
+<img src="/image/EV_icons_2.png" alt="Easy Edit" style={{height:36,width:'auto',flexShrink:0}}/>
 {editingName?
 <input autoFocus value={nameVal} onChange={e=>setNameVal(e.target.value)} onBlur={()=>{setProjectName(nameVal||'Untitled Project');setEditingName(false);}} onKeyDown={e=>{if(e.key==='Enter')e.target.blur();}} style={{fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,padding:'6px 10px',borderRadius:'var(--radius-sm)',border:'1px solid var(--border-default)',textAlign:'center'}}/>
 :<span onClick={()=>{setNameVal(projectName);setEditingName(true);}} style={{fontFamily:'var(--font-body)',fontSize:14,fontWeight:600,color:'var(--text-primary)',cursor:'text',padding:'6px 4px'}}>{projectName}</span>}
